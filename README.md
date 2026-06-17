@@ -5,6 +5,8 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
+![git-why demo](assets/demo.gif)
+
 **`git blame` tells you who broke it. `git-why` tells you why it's there in the first place.**
 
 You're staring at a weird `if` statement at 11pm. `git blame` gives you a name and a date. It doesn't tell you the bug it fixed, the edge case it was guarding against, or whether it's safe to delete. `git-why` reads the actual commit history and diffs around that line and gives you the story — no API key required, no internet connection required, no setup beyond `pip install`.
@@ -45,38 +47,7 @@ git-why src/auth.py:42 --verbose
 git-why src/auth.py:42 --provider offline
 ```
 
-Targets use `FILE`, `FILE:LINE`, or `FILE:START-END`.
-
-## Demo
-
-```
-git-why  auth.py:5 ─────────────────────────────────────────────────
- Offline  ·  offline / free, no network calls
-
-╭─ Current code ───────────────────────────────────────────────────╮
-│   1 def is_authenticated(user):                                  │
-│   2     if user is None:                                         │
-│   3         return False                                         │
-│   4     if not user.session_token:                                │
-│ ❱ 5         return False                                         │
-│   6     if user.session_expires_at <= now():                      │
-│   7         return False                                          │
-│   8     return True                                               │
-╰─────────────────────────────────────────────────────────────────╯
-
-Commits analyzed (3)
-  7ffcd9198e  2026-06-16  Smoke Tester  Handle missing session token
-  23a42ce214  2026-06-16  Smoke Tester  Prevent expired sessions
-  66daa7c494  2026-06-16  Smoke Tester  Add basic login check
-
-╭─ Explanation ───────────────────────────────────────────────────╮
-│ Likely reason: the strongest local signal is `7ffcd9198e`,       │
-│ "Handle missing session token" — recurring terms across these    │
-│ commits point to session/token expiry handling.                  │
-╰───────────────────────────────────────────────────────────────╯
-```
-
-Real output is syntax-highlighted and color-coded by provider in your terminal — this is the plain-text shape of it.
+Targets use `FILE`, `FILE:LINE`, or `FILE:START-END`. See the demo above for what the output actually looks like.
 
 ## Offline And Free Mode
 

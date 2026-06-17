@@ -44,7 +44,7 @@ def _provider_badge(provider: str) -> Text:
     suffix = "  ·  offline / free, no network calls" if provider == "offline" else ""
     badge = Text(f" {label} ", style=f"bold white on {color}")
     if suffix:
-        badge.append(suffix, style="dim")
+        badge.append(suffix, style="dim on default")
     return badge
 
 
