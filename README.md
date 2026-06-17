@@ -1,21 +1,24 @@
 # git-why
 
 [![CI](https://github.com/Sameer988/git-why/actions/workflows/ci.yml/badge.svg)](https://github.com/Sameer988/git-why/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
+[![Stars](https://img.shields.io/github/stars/Sameer988/git-why.svg?style=flat)](https://github.com/Sameer988/git-why/stargazers)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-
-![git-why demo](assets/demo.gif)
 
 **`git blame` tells you who broke it. `git-why` tells you why it's there in the first place.**
 
-You're staring at a weird `if` statement at 11pm. `git blame` gives you a name and a date. It doesn't tell you the bug it fixed, the edge case it was guarding against, or whether it's safe to delete. `git-why` reads the actual commit history and diffs around that line and gives you the story — no API key required, no internet connection required, no setup beyond `pip install`.
+It's 11pm. You've found a six-line guard clause that looks paranoid, maybe even wrong. `git blame` says Dave wrote it three years ago. Dave doesn't work here anymore. Do you delete it and hope, or burn twenty minutes in `git log -p` praying the commit message isn't just "fix"?
+
+`git-why` does that archaeology for you — in under a second, completely offline, no API key, no setup beyond `pip install`.
 
 ```bash
 git-why src/auth.py:42
 ```
 
-That's it. Point it at a file, a line, or a range, and it reconstructs the "why" from what your team already wrote down in commit messages and diffs — completely offline by default, or handed off to Claude/GPT/Gemini/Ollama/OpenRouter if you want a richer narrative.
+![git-why demo](assets/demo.gif)
+
+It reads the actual commits and diffs around that line and reconstructs the story nobody wrote down anywhere else — or hands the same context to Claude/GPT/Gemini/Ollama/OpenRouter if you want a richer, AI-narrated version.
 
 ⭐ **If this saves you a Slack message to a teammate who left the company two years ago, consider starring it** — it helps other people stumbling through the same archaeology find this instead of reinventing it.
 
