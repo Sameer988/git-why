@@ -1,8 +1,21 @@
 # git-why
 
-`git blame` tells you who. `git-why` tells you why.
+[![CI](https://github.com/Sameer988/git-why/actions/workflows/ci.yml/badge.svg)](https://github.com/Sameer988/git-why/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-`git-why` is a Python CLI that inspects local git history for a file or line range and explains why code exists. It can run completely offline and free with no API key, and it can optionally use configured AI providers.
+**`git blame` tells you who broke it. `git-why` tells you why it's there in the first place.**
+
+You're staring at a weird `if` statement at 11pm. `git blame` gives you a name and a date. It doesn't tell you the bug it fixed, the edge case it was guarding against, or whether it's safe to delete. `git-why` reads the actual commit history and diffs around that line and gives you the story — no API key required, no internet connection required, no setup beyond `pip install`.
+
+```bash
+git-why src/auth.py:42
+```
+
+That's it. Point it at a file, a line, or a range, and it reconstructs the "why" from what your team already wrote down in commit messages and diffs — completely offline by default, or handed off to Claude/GPT/Gemini/Ollama/OpenRouter if you want a richer narrative.
+
+⭐ **If this saves you a Slack message to a teammate who left the company two years ago, consider starring it** — it helps other people stumbling through the same archaeology find this instead of reinventing it.
 
 ## Install
 
@@ -33,6 +46,37 @@ git-why src/auth.py:42 --provider offline
 ```
 
 Targets use `FILE`, `FILE:LINE`, or `FILE:START-END`.
+
+## Demo
+
+```
+git-why  auth.py:5 ─────────────────────────────────────────────────
+ Offline  ·  offline / free, no network calls
+
+╭─ Current code ───────────────────────────────────────────────────╮
+│   1 def is_authenticated(user):                                  │
+│   2     if user is None:                                         │
+│   3         return False                                         │
+│   4     if not user.session_token:                                │
+│ ❱ 5         return False                                         │
+│   6     if user.session_expires_at <= now():                      │
+│   7         return False                                          │
+│   8     return True                                               │
+╰─────────────────────────────────────────────────────────────────╯
+
+Commits analyzed (3)
+  7ffcd9198e  2026-06-16  Smoke Tester  Handle missing session token
+  23a42ce214  2026-06-16  Smoke Tester  Prevent expired sessions
+  66daa7c494  2026-06-16  Smoke Tester  Add basic login check
+
+╭─ Explanation ───────────────────────────────────────────────────╮
+│ Likely reason: the strongest local signal is `7ffcd9198e`,       │
+│ "Handle missing session token" — recurring terms across these    │
+│ commits point to session/token expiry handling.                  │
+╰───────────────────────────────────────────────────────────────╯
+```
+
+Real output is syntax-highlighted and color-coded by provider in your terminal — this is the plain-text shape of it.
 
 ## Offline And Free Mode
 
