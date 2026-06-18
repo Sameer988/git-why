@@ -185,6 +185,7 @@ python -m pytest
 - Offline explanations are heuristic and based only on local git history.
 - Deleted or renamed files depend on what git can resolve from the current working tree.
 - Whole-file mode caps the displayed current code preview.
+- Binary files are detected and shown as a placeholder rather than raw bytes; commit history still comes from `git log`, but line-level `git blame` is skipped since line numbers aren't meaningful for binary content.
 - AI providers require their respective SDKs, keys, or local services only when explicitly selected or available in `auto`.
 - The package has not been published to PyPI yet.
 

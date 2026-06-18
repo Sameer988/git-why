@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "git-why"
 version = "0.1.0"
-description = "A CLI that explains why code exists by analyzing git history."
+description = "git blame tells you who. git-why tells you why — explains code from local git history, offline or with AI."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
