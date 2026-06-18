@@ -50,12 +50,30 @@ def run_git(args: list[str]) -> str:
     return result.stdout
 
 
+def _is_binary(path: Path) -> bool:
+    try:
+        with open(path, "rb") as f:
+            sample = f.read(8192)
+    except OSError:
+        return False
+    return b"\x00" in sample
+
+
+BINARY_PLACEHOLDER = "[binary file - content preview not shown]"
+
+
+class _BinaryFile(Exception):
+    pass
+
+
 def _read_lines(file_path: str) -> list[str]:
     path = Path(file_path)
     if not path.exists():
         raise GitAnalysisError(f"File not found: {file_path}")
     if not path.is_file():
         raise GitAnalysisError(f"Target is not a file: {file_path}")
+    if _is_binary(path):
+        raise _BinaryFile()
     try:
         return path.read_text(encoding="utf-8-sig", errors="replace").splitlines()
     except OSError as exc:
@@ -68,7 +86,10 @@ def get_file_content(
     line_end: int | None,
     context: int,
 ) -> str:
-    lines = _read_lines(file_path)
+    try:
+        lines = _read_lines(file_path)
+    except _BinaryFile:
+        return BINARY_PLACEHOLDER
     if line_start is None or line_end is None:
         shown = lines[:120]
         suffix = "\n... [truncated]" if len(lines) > 120 else ""
@@ -105,7 +126,10 @@ def read_target_lines(
     Kept separate from get_file_content, which produces the plain-text,
     marker-annotated version used in AI prompts and offline explanations.
     """
-    lines = _read_lines(file_path)
+    try:
+        lines = _read_lines(file_path)
+    except _BinaryFile:
+        return [BINARY_PLACEHOLDER], 1, set()
     if line_start is None or line_end is None:
         shown = lines[:120]
         return shown, 1, set()
@@ -160,6 +184,11 @@ def get_commit_details(commit_hash: str, file_path: str) -> CommitInfo:
     )
 
 
+def is_binary_file(file_path: str) -> bool:
+    path = Path(file_path)
+    return path.is_file() and _is_binary(path)
+
+
 def analyze_target(
     file_path: str,
     line_start: int | None,
@@ -168,7 +197,14 @@ def analyze_target(
     context: int,
 ) -> GitAnalysis:
     target_code = get_file_content(file_path, line_start, line_end, context)
-    blame_hashes = get_blame_hashes(file_path, line_start, line_end)
+    # git blame depends on real line semantics, which are meaningless for binary
+    # content -- and a binary file may have far fewer "lines" than the requested
+    # range, which would make git itself error out. git log doesn't depend on
+    # line numbers, so commit history is unaffected either way.
+    if is_binary_file(file_path):
+        blame_hashes: list[str] = []
+    else:
+        blame_hashes = get_blame_hashes(file_path, line_start, line_end)
     log_hashes = get_log_hashes(file_path, depth)
     commit_hashes = list(dict.fromkeys([*blame_hashes, *log_hashes]))
     commits = [get_commit_details(commit_hash, file_path) for commit_hash in commit_hashes]

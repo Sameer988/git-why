@@ -41,3 +41,27 @@ def test_read_target_lines_whole_file_has_no_highlight(tmp_path):
     assert start_line == 1
     assert lines == ["a = 1", "b = 2"]
     assert highlighted == set()
+
+
+def test_get_file_content_handles_binary_file_gracefully(tmp_path):
+    path = tmp_path / "blob.bin"
+    path.write_bytes(bytes(range(256)))
+
+    # Whole-file mode should not crash or dump raw bytes.
+    content = get_file_content(str(path), None, None, context=8)
+    assert "binary file" in content.lower()
+
+    # Line-range mode must not explode with a misleading "has N lines" error
+    # just because the binary placeholder is a single line.
+    content_ranged = get_file_content(str(path), 42, 42, context=8)
+    assert "binary file" in content_ranged.lower()
+
+
+def test_read_target_lines_handles_binary_file_gracefully(tmp_path):
+    path = tmp_path / "blob.bin"
+    path.write_bytes(bytes(range(256)))
+
+    lines, start_line, highlighted = read_target_lines(str(path), 42, 42, context=8)
+    assert any("binary file" in line.lower() for line in lines)
+    assert start_line == 1
+    assert highlighted == set()
