@@ -1,6 +1,7 @@
 # git-why
 
 [![CI](https://github.com/Sameer988/git-why/actions/workflows/ci.yml/badge.svg)](https://github.com/Sameer988/git-why/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/git-why.svg)](https://pypi.org/project/git-why/)
 [![Stars](https://img.shields.io/github/stars/Sameer988/git-why.svg?style=flat)](https://github.com/Sameer988/git-why/stargazers)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)
@@ -24,19 +25,18 @@ It reads the actual commits and diffs around that line and reconstructs the stor
 
 ## Install
 
-From a local checkout:
-
-```bash
-pip install -e .
-```
-
-From PyPI after publish:
-
 ```bash
 pip install git-why
 ```
 
-PyPI publishing is coming soon; until then, use the local editable install.
+Or with an AI provider extra:
+
+```bash
+pip install "git-why[claude]"    # Anthropic Claude
+pip install "git-why[openai]"    # OpenAI GPT
+pip install "git-why[gemini]"    # Google Gemini
+pip install "git-why[all]"       # all providers
+```
 
 ## Quick Start
 
@@ -187,7 +187,6 @@ python -m pytest
 - Whole-file mode caps the displayed current code preview.
 - Binary files are detected and shown as a placeholder rather than raw bytes; commit history still comes from `git log`, but line-level `git blame` is skipped since line numbers aren't meaningful for binary content.
 - AI providers require their respective SDKs, keys, or local services only when explicitly selected or available in `auto`.
-- The package has not been published to PyPI yet.
 
 ## Roadmap
 

@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [
-    { name = "git-why contributors" },
+    { name = "Sameer988", email = "sameer@samiebuilds.dev" },
 ]
 keywords = ["git", "cli", "blame", "history", "developer-tools"]
 classifiers = [
