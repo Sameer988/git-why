@@ -190,7 +190,9 @@ python -m pytest
 
 ## Roadmap
 
-- Publish to PyPI.
-- Add CI for tests and packaging checks.
+- Add CI for automated PyPI publishing on release tags (done — `.github/workflows/publish.yml`).
 - Improve provider response parsing and error reporting.
-- Add more git-history context, such as issue or PR links when present in commit messages.
+- Add PR/issue linking when commit messages reference GitHub/GitLab/Jira.
+- Smarter diff heuristics for repos with low-quality commit messages.
+- VS Code extension — inline "Why?" on any line.
+- Shell completions for zsh/bash/fish.
