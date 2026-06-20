@@ -41,16 +41,39 @@ pip install "git-why[all]"       # all providers
 ## Quick Start
 
 ```bash
-git-why src/auth.py
-git-why src/auth.py:42
-git-why src/auth.py:42-60
-git-why src/auth.py:42 --depth 30
-git-why src/auth.py:42 --context 15
-git-why src/auth.py:42 --verbose
-git-why src/auth.py:42 --provider offline
+git-why src/auth.py                        # whole file
+git-why src/auth.py:42                     # single line
+git-why src/auth.py:42-60                  # line range
+git-why src/auth.py:42 --provider claude   # use Claude for richer explanation
+git-why src/auth.py:42 --depth 30         # inspect more commits
+git-why src/auth.py:42 --verbose           # show raw context
+git-why completions --install              # set up tab completion
 ```
 
 Targets use `FILE`, `FILE:LINE`, or `FILE:START-END`. See the demo above for what the output actually looks like.
+
+## Shell Completions
+
+Tab-complete file paths, `--provider` choices, and all flags.
+
+**Automatic install (detects your shell):**
+```bash
+git-why completions --install
+```
+
+**Manual setup:**
+```bash
+# bash — add to ~/.bashrc
+eval "$(_GIT_WHY_COMPLETE=bash_source git-why)"
+
+# zsh — add to ~/.zshrc
+eval "$(_GIT_WHY_COMPLETE=zsh_source git-why)"
+
+# fish — add to ~/.config/fish/config.fish
+eval (env _GIT_WHY_COMPLETE=fish_source git-why)
+```
+
+Static scripts are also in the [`completions/`](completions/) directory for package managers.
 
 ## Offline And Free Mode
 
