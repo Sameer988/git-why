@@ -213,9 +213,16 @@ python -m pytest
 
 ## Roadmap
 
-- Add CI for automated PyPI publishing on release tags (done — `.github/workflows/publish.yml`).
-- Improve provider response parsing and error reporting.
-- Add PR/issue linking when commit messages reference GitHub/GitLab/Jira.
-- Smarter diff heuristics for repos with low-quality commit messages.
-- VS Code extension — inline "Why?" on any line.
-- Shell completions for zsh/bash/fish.
+**Done:**
+- Publish to PyPI (`pip install git-why`) ✓
+- Auto-publish to PyPI on GitHub release tags (`.github/workflows/publish.yml`) ✓
+- PR/issue linking — GitHub/GitLab API with git notes caching and rate limiting ✓
+- Smarter diff heuristics — 15 semantic patterns (null-guards, error handling, auth, rate-limiting, concurrency, caching, and more) ✓
+- Shell completions — bash, zsh, fish with `git-why completions --install` ✓
+- Binary file handling ✓
+
+**Next:**
+- VS Code extension — inline "Why?" hover on any line (biggest reach multiplier)
+- Neovim plugin — Lua, direct CLI call
+- Config file support (`.git-why.toml`) — persistent provider, depth, model preferences
+- Improve provider response parsing and error reporting
