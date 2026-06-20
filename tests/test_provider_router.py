@@ -75,7 +75,7 @@ def test_cli_help_does_not_require_api_keys(monkeypatch):
     _clear_env(monkeypatch)
     runner = CliRunner()
 
-    result = runner.invoke(main, ["--help"])
+    result = runner.invoke(main, ["explain", "--help"])
 
     assert result.exit_code == 0
     assert "--provider" in result.output
