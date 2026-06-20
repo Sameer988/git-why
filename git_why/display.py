@@ -112,10 +112,57 @@ def render_analysis(
     table.add_column("Author")
     table.add_column("Message")
     for commit in analysis.commits[:6]:
-        table.add_row(commit.short_hash, commit.date, commit.author, commit.message)
+        # Append any linked refs inline after the message.
+        msg = commit.message
+        if commit.refs:
+            ref_parts = []
+            for ref in commit.refs:
+                if ref.url:
+                    ref_parts.append(f"[link={ref.url}]{ref.ref}[/link]")
+                else:
+                    ref_parts.append(ref.ref)
+            msg += "  " + "  ".join(ref_parts)
+        table.add_row(commit.short_hash, commit.date, commit.author, msg)
     if not analysis.commits:
         table.add_row("-", "-", "-", "No commits found")
     console.print(table)
+
+    # Linked references panel — only shown when at least one ref has a fetched title.
+    enriched_refs: list = []
+    seen_refs: set[str] = set()
+    for commit in analysis.commits:
+        for ref in getattr(commit, "refs", []):
+            if ref.ref not in seen_refs and ref.title:
+                enriched_refs.append(ref)
+                seen_refs.add(ref.ref)
+
+    if enriched_refs:
+        lines = []
+        for ref in enriched_refs:
+            cache_tag = " [dim](cached)[/dim]" if ref.from_cache else ""
+            if ref.url:
+                header = f"[bold cyan][link={ref.url}]{ref.ref}[/link][/bold cyan]{cache_tag}  [dim]{ref.url}[/dim]"
+            else:
+                header = f"[bold cyan]{ref.ref}[/bold cyan]{cache_tag}"
+            lines.append(header)
+            lines.append(f"  [bold]{ref.title}[/bold]")
+            if ref.body_snippet:
+                snippet = ref.body_snippet.replace("\n", " ").strip()
+                lines.append(f"  [dim]{snippet[:200]}[/dim]")
+            lines.append("")
+        console.print(
+            Panel(
+                "\n".join(lines).rstrip(),
+                title="[bold]Linked references[/bold]",
+                title_align="left",
+                border_style="cyan",
+                box=box.ROUNDED,
+            )
+        )
+
+    if analysis.rate_limit_warning:
+        console.print(f"[yellow]⚠ {analysis.rate_limit_warning}[/yellow]")
+
     console.print()
 
     _, accent = PROVIDER_STYLES.get(provider, ("", "cyan"))

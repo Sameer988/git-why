@@ -64,6 +64,12 @@ def parse_target(target: str) -> tuple[str, int | None, int | None]:
 )
 @click.option("--model", default=None, help="Override the selected provider model.")
 @click.option("--verbose", "-v", is_flag=True, help="Show raw analysis context.")
+@click.option(
+    "--fetch-refs/--no-fetch-refs",
+    default=True,
+    show_default=True,
+    help="Fetch PR/issue titles from GitHub/GitLab API (cached in git notes).",
+)
 def main(
     target: str,
     depth: int,
@@ -71,12 +77,13 @@ def main(
     provider: str,
     model: str | None,
     verbose: bool,
+    fetch_refs: bool,
 ) -> None:
     """Explain why code exists using local git history."""
     try:
         file_path, line_start, line_end = parse_target(target)
         with console.status("[bold cyan]Reading git history...[/bold cyan]", spinner="dots"):
-            analysis = analyze_target(file_path, line_start, line_end, depth, context_lines)
+            analysis = analyze_target(file_path, line_start, line_end, depth, context_lines, fetch_refs=fetch_refs)
         selected_provider = provider_for(provider)
         prompt = build_prompt(analysis)
         if selected_provider.name == "offline":

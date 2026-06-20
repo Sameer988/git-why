@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import subprocess
 
@@ -17,6 +17,7 @@ class CommitInfo:
     date: str
     message: str
     diff: str
+    refs: list = field(default_factory=list)  # list[LinkedRef] — populated by linker
 
 
 @dataclass
@@ -28,6 +29,7 @@ class GitAnalysis:
     commits: list[CommitInfo]
     raw_context: str
     context_lines: int = 8
+    rate_limit_warning: str | None = None
 
 
 def run_git(args: list[str]) -> str:
@@ -195,7 +197,10 @@ def analyze_target(
     line_end: int | None,
     depth: int,
     context: int,
+    fetch_refs: bool = True,
 ) -> GitAnalysis:
+    from git_why.linker import enrich_commits
+
     target_code = get_file_content(file_path, line_start, line_end, context)
     # git blame depends on real line semantics, which are meaningless for binary
     # content -- and a binary file may have far fewer "lines" than the requested
@@ -208,6 +213,8 @@ def analyze_target(
     log_hashes = get_log_hashes(file_path, depth)
     commit_hashes = list(dict.fromkeys([*blame_hashes, *log_hashes]))
     commits = [get_commit_details(commit_hash, file_path) for commit_hash in commit_hashes]
+
+    enrich_result = enrich_commits(commits, fetch_refs=fetch_refs)
 
     raw_context_parts = [
         f"file_path: {file_path}",
@@ -231,4 +238,5 @@ def analyze_target(
         commits=commits,
         raw_context="\n".join(raw_context_parts),
         context_lines=context,
+        rate_limit_warning=enrich_result.rate_limit_warning,
     )
