@@ -70,4 +70,14 @@ def build_prompt(analysis: GitAnalysis) -> str:
     if refs_block:
         parts.append("Linked PR/issue references (fetched from GitHub/GitLab):\n" + refs_block)
 
+    # Add diff pattern signals so the AI can cite them.
+    from git_why.diff_analyzer import analyze_corpus, build_diff_explanation
+    corpus = analyze_corpus(analysis.commits)
+    diff_insight = build_diff_explanation(corpus)
+    if diff_insight:
+        parts.append(
+            "Diff pattern analysis (automated heuristics from the actual code changes):\n"
+            + diff_insight
+        )
+
     return "\n\n".join(parts)
